@@ -42,3 +42,8 @@ To allow access to the Unsplash API you need to register as a developer with uns
 ### Conclusion
 Please respond to us when you have finished with the link to your repo
 If you get stuck or have a question please feel free to contact us.
+
+### Review
+- Use vagrant v 2.2.10
+- Using WSL is not reliable as there is no VM for the WSL
+- 
