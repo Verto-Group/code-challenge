@@ -88,7 +88,7 @@
             test () {
                 // var data = { text: this.text }
 
-                fetch('http://localhost:8001/api/test', {
+                fetch('api/test', {
                     method: 'GET', // *GET, POST, PUT, DELETE, etc.
                     headers: {
                     'Content-Type': 'application/json'
@@ -110,22 +110,6 @@
                 .catch(err => console.error(err))
             },
 
-             beforeMount() {
-                    window.addEventListener("beforeunload", this.preventNav)
-                    this.$once("hook:beforeDestroy", () => {
-                    window.removeEventListener("beforeunload", this.preventNav);
-                })
-            },
-
-            beforeRouteLeave(to, from, next) {
-                if (this.isEditing) {
-                    if (!window.confirm("Leave without saving?")) {
-                        return;
-                    }
-                }
-                next();
-            },
-            
             fetchPictures() {
                 let clientId = '8f2610cce8b7e60e887e6c6024cae7be704ffabd1aea6d7caa9dbefe4e70ab46';
                 let searchValue = this.searchValue;
@@ -149,7 +133,6 @@
                         }
                         this.noResults = false;
                         this.noSearch = false;
-                        console.log("Success - Data Source" + this.pictures)
                     })
             },
 
@@ -177,9 +160,7 @@
                     let client_id = '8f2610cce8b7e60e887e6c6024cae7be704ffabd1aea6d7caa9dbefe4e70ab46';
                     let url = `https://api.unsplash.com/photos/${myphoto_id}/download?client_id=${client_id}`;
                     this.downloadWithVueResource(url,myphoto_id);
-                    console.log("Hapa ni URL main" + url);
                 }else{
-                    alert('Not found!')
                     return 
                 }
             },

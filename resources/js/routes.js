@@ -14,11 +14,6 @@ export const routes = [
         component: Search
     },
     {
-        name: 'saved',
-        path: '/saved',
-        component: SavedPost
-    },
-    {
         name: 'edit',
         path: '/edit/:id',
         component: EditPost

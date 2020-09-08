@@ -20,10 +20,12 @@ Route::get('ping', function () {
     return 'Alive !';
 });
 
-Route::get('test', 'PhotoController@test');
+Route::get('test', 'PhotosController@test');
 
 Route::group(['prefix' => 'photo'], function () {
-    Route::post('search', 'PhotoController@search');
+    Route::post('search', 'PhotosController@search');
+    Route::post('save', 'PhotosController@store');
+    Route::get('saved', 'PhotosController@index');
 });
 
 Route::group(['prefix' => 'photo'], function () {

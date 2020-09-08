@@ -3,11 +3,15 @@
         <div class="card-body">
 
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="collapse navbar-collapse">
+                <a class="navbar-brand" href="#">Navbar</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <router-link to="/" class="nav-item nav-link">Home</router-link>
-                        <router-link to="/search" class="nav-item nav-link">Search Photo</router-link>
-                        <router-link to="/saved" class="nav-item nav-link">View Saved</router-link>
+                        <a href="/search" class="nav-item nav-link">Home</a>
+                        <a href="/" class="nav-item nav-link">View Saved</a>
                     </div>
                 </div>
             </nav>

@@ -8,9 +8,9 @@
             <input v-on:dblclick="disableEditing" type="text" v-model="tempValue" class="form-control mb-3" v-on:keyup.enter.prevent="saveEdit" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
         </div>
         <div class="row justify-content-around">
-            <button v-on:click="addPhoto" type="button" class="btn btn-outline-success col-5 btn-sm">Save to MyMedia</button>
-            <button v-if="!editing" v-on:click="enableEditing" type="button" class="btn btn-outline-info col-5 btn-sm">Edit description</button>
-            <button v-if="editing" v-on:click="saveEdit" type="button" class="btn btn-outline-info col-5 btn-sm">Save description</button> 
+            <button v-on:click="addPhoto" type="button" class="btn btn-outline-success col-5 btn-sm">Save</button>
+            <button v-if="!editing" v-on:click="enableEditing" type="button" class="btn btn-outline-info col-5 btn-sm">Edit</button>
+            <button v-if="editing" v-on:click="saveEdit" type="button" class="btn btn-outline-info col-5 btn-sm">Update</button> 
         </div>
     </div>
     
@@ -60,12 +60,12 @@ export default {
                 this.photoData = {
                     title: this.title,
                     //incase empty string
-                    boby: this.value !== null? this.value: "Click to edit",
+                    body: this.value !== null? this.value: "Click to edit",
                     picture_id:this.photoId,
-                    picture_url:this.photoUrl
+                    picture_url:this.photoUrl,
                 }
                 //Add picture to DB
-                fetch('api/article',{
+                fetch('api/photo/save',{
                     method:'post',
                     body:JSON.stringify(this.photoData),
                     headers: {
@@ -75,10 +75,12 @@ export default {
                 .then(res=>res.json())
                 .then(data=>{
                     this.photoData.title ='';
-                    this.photoData.boby = '';
+                    this.photoData.body = '';
                     this.photoData.picture_id = '';
                     this.photoData.picture_url = '';
                     alert('Picture Saved');
+                    console.log('Valid content' + this.photoData)
+
                 })
             }
         }

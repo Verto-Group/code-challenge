@@ -1,94 +1,121 @@
 <template>
-    <div>
-        <!-- <h3 class="text-center">All Posts</h3><br/>
- 
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="post in posts" :key="post.id">
-                <td>{{ post.id }}</td>
-                <td>{{ post.title }}</td>
-                <td>{{ post.description }}</td>
-                <td>{{ post.created_at }}</td>
-                <td>{{ post.updated_at }}</td>
-                <td>
-                    <div class="btn-group" role="group">
-                        <router-link :to="{name: 'edit', params: { id: post.id }}" class="btn btn-primary">Edit
-                        </router-link>
-                        <button class="btn btn-danger" @click="deletePost(post.id)">Delete</button>
+    <div> 
+        <!-- search results display -->
+        <div class="container">
+            <div class="card-columns">
+                <div class="card border-light" v-for="picture in pictures" :key="picture.id">
+                    <!-- picture hover css class -->
+                    <div class="box14">
+                        <!-- each picture display with zoom function -->
+                        <expandable-image
+                            class="image card-img-top"
+                            :src="picture.download_url"
+                            alt="picture.image_description"
+                        />
+                        <div class="box-content">
+                            <h3 class="title">{{searchValue}}: {{picture.id}}</h3>
+                            <ul class="icon">
+                                <li><a ><i class="far fa-heart"></i></a></li>
+                                <li><a @click.self = "downloadBig" :data-id="picture.id"><i class="fas fa-download"></i></a></li>
+                            </ul>
+                        </div>
                     </div>
-                </td>
-            </tr>
-            </tbody>
-        </table> -->
-         <!-- search results display -->
-    <div class="container">
-        <div class="card-columns">
-            <div class="card border-light" v-for="picture in pictures" :key="picture.id">
-                <!-- picture hover css class -->
-                <div class="box14">
-                    <!-- each picture display with zoom function -->
-                    <expandable-image
-                        class="image card-img-top"
-                        :src="picture.urls.regular"
-                        alt="picture.description"
-                    />
-                    <div class="box-content">
-                        <h3 class="title">{{searchValue}}: {{picture.id}}</h3>
-                        <ul class="icon">
-                            <li><a ><i class="far fa-heart"></i></a></li>
-                            <li><a @click.self = "downloadBig" :data-id="picture.id"><i class="fas fa-download"></i></a></li>
-                        </ul>
-                    </div>
+
+                    <!-- each picture infor component -->
+                    <search-cardBody :description = "picture.image_description" :title = "searchValue" :photoId = "picture.id" :photoUrl = "picture.download_url"/>
+
                 </div>
-
-                <!-- each picture infor component -->
-                <search-cardBody :description = "picture.description" :title = "searchValue" :photoId = "picture.id" :photoUrl = "picture.urls.regular"/>
-
             </div>
+            <!-- lazy loading pictutes observer componet -->
+            <observer v-on:intersect="intersected" />
         </div>
-        <!-- lazy loading pictutes observer componet -->
-        <observer v-on:intersect="intersected" />
-    </div>
     </div>
 </template>
  
 <script>
+    import observer from './commonuse/observer';
+    import searchCardBody from './commonuse/searchCardBody';
+    import expandableImage from './commonuse/expandableImage';
+
     export default {
         data() {
             return {
                 posts: [],
                 pictures:[],
                 intersected:[],
-
-
             }
+        },
+        components: {
+            observer,expandableImage,searchCardBody
         },
         created() {
             this.axios
-                .get('http://localhost:8000/api/posts')
+                .get('api/photo/saved')
                 .then(response => {
-                    this.posts = response.data;
+                    this.pictures = response.data;
                 });
         },
         methods: {
-            deletePost(id) {
-                this.axios
-                    .delete(`http://localhost:8000/api/post/delete/${id}`)
+            deletePictureById(deletePictureId){
+                if(confirm("Are you sure you want to delete this picture from library?")){
+                    this.deleteData = {
+                                picture_id: deletePictureId
+                        };
+                        fetch('api/delete',{
+                                method:'delete',
+                                body:JSON.stringify(this.deleteData),
+                                headers: {
+                                    'content-type':'application/json'
+                                }
+                        })
+                        .then(()=>{
+                            this.pageLoad = true;
+                            this.deleteData.picture_id = '';
+                            location.reload();
+                        })
+                }
+            },
+            downloadBig(e) {
+                if(e){
+                    let temp = e.target.attributes; 
+                    let myphoto_id = temp["data-id"].value;
+                    let client_id = '8f2610cce8b7e60e887e6c6024cae7be704ffabd1aea6d7caa9dbefe4e70ab46';
+                    let url = `https://api.unsplash.com/photos/${myphoto_id}/download?client_id=${client_id}`;
+                    this.downloadWithVueResource(url,myphoto_id);
+                    // console.log(url);
+                }else{
+                    alert('Not found!')
+                    return 
+                }
+            },
+            forceFileDownload(url,myphoto_id){
+                const link = document.createElement('a');
+                link.href = url;
+                link.style.display = "none";
+                document.body.appendChild(link);
+                link.setAttribute('target','_blank');
+                link.setAttribute('download',  `${myphoto_id}.jpg`) //or any other extension
+
+                link.click();
+
+                window.URL.revokeObjectURL(link.href);
+                document.body.removeChild(link);
+
+                //to be fixed, child node can't be remove by click but after refresh
+            },
+            downloadWithVueResource(url,myphoto_id) {
+                fetch(url)
+                    .then(data=>{
+                        return data.json();
+                    })
                     .then(response => {
-                        let i = this.posts.map(item => item.id).indexOf(id); // find index of your object
-                        this.posts.splice(i, 1)
-                    });
-            }
+                        this.forceFileDownload(response.url,myphoto_id)  
+                    })
+                    .catch(() => console.log('error occured'))
+            
+            },
+                
         }
+        
     }
 </script>
